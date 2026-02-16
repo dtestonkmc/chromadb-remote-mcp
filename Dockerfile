@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
+    graphicsmagick \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,6 +34,7 @@ LABEL io.modelcontextprotocol.server.name="io.github.meloncafe/chromadb-remote-m
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
+    graphicsmagick \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 

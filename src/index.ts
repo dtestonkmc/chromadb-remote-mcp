@@ -988,7 +988,7 @@ export function createServer(): Server {
         prompts: {},
         resources: {},
         logging: {},
-        completion: {},
+        completions: {},
       },
     },
   );

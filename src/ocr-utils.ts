@@ -1,4 +1,5 @@
 import Tesseract from 'tesseract.js';
+// @ts-ignore - pdf-parse doesn't have TypeScript definitions
 import pdfParse from 'pdf-parse';
 
 /**

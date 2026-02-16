@@ -7,7 +7,7 @@ RUN corepack enable
 
 # Install dependencies
 COPY package.json yarn.lock* ./
-RUN yarn install --frozen-lockfile --ignore-scripts
+RUN yarn install --immutable
 
 # Copy source code
 COPY tsconfig.json ./
@@ -33,7 +33,7 @@ RUN corepack enable
 
 # Copy package files and install production dependencies only
 COPY package.json yarn.lock* ./
-RUN yarn install --frozen-lockfile --production --ignore-scripts \
+RUN yarn workspaces focus --production \
     && yarn cache clean
 
 # Copy built files from builder

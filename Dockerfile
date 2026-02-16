@@ -2,6 +2,13 @@ FROM node:24.13.0-slim AS builder
 
 WORKDIR /app
 
+# Install system dependencies for OCR
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
 # Enable Corepack for Yarn
 RUN corepack enable
 
@@ -22,6 +29,12 @@ FROM node:24.13.0-slim
 # MCP Register Label
 LABEL io.modelcontextprotocol.server.name="io.github.meloncafe/chromadb-remote-mcp"
 
+# Install system dependencies for OCR
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN groupadd -r mcpuser && useradd -r -g mcpuser mcpuser

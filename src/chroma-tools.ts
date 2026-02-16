@@ -1,4 +1,5 @@
 import { ChromaClient } from "chromadb";
+import { extractTextFromFile } from "./ocr-utils.js";
 
 interface PaginationCursor {
   offset: number;
@@ -415,6 +416,36 @@ export function createChromaTools(_chromaClient: ChromaClient) {
         required: ["collection_name", "ids"],
       },
     },
+    {
+      name: "chroma_add_documents_from_file",
+      description: "OCR a file (PDF or image) and add the extracted text to a ChromaDB collection",
+      inputSchema: {
+        type: "object",
+        properties: {
+          collection_name: {
+            type: "string",
+            description: "Name of the collection to add documents to",
+          },
+          file_data: {
+            type: "string",
+            description: "Base64 encoded file content",
+          },
+          file_type: {
+            type: "string",
+            description: "File extension (pdf, png, jpg, jpeg, etc.)",
+          },
+          document_id: {
+            type: "string",
+            description: "Unique ID for this document",
+          },
+          metadata: {
+            type: "object",
+            description: "Optional metadata to attach to the document",
+          },
+        },
+        required: ["collection_name", "file_data", "file_type", "document_id"],
+      },
+    },
   ];
 }
 
@@ -683,6 +714,47 @@ export async function handleChromaTool(
             {
               type: "text",
               text: `Deleted ${args.ids.length} documents from collection '${args.collection_name}'`,
+            },
+          ],
+        };
+      }
+
+      case "chroma_add_documents_from_file": {
+        // Decode base64 file data
+        const fileBuffer = Buffer.from(args.file_data, "base64");
+        
+        // Extract text using OCR
+        const extractedText = await extractTextFromFile(fileBuffer, args.file_type);
+        
+        if (!extractedText) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `No text extracted from file`,
+              },
+            ],
+          };
+        }
+        
+        // Get collection
+        const collection = await chromaClient.getOrCreateCollection({
+          name: args.collection_name,
+          embeddingFunction: undefined,
+        });
+        
+        // Add to ChromaDB
+        await collection.add({
+          ids: [args.document_id],
+          documents: [extractedText],
+          metadatas: args.metadata ? [args.metadata] : undefined,
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully OCR'd and added document '${args.document_id}' to collection '${args.collection_name}'. Extracted ${extractedText.length} characters.`,
             },
           ],
         };

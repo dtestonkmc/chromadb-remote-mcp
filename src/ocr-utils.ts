@@ -22,6 +22,7 @@ export async function ocrImage(imageBuffer: Buffer): Promise<string> {
       lang: 'eng',
       oem: 1,
       psm: 3,
+      binary: '/usr/bin/tesseract'  // Explicitly set binary path
     };
     
     const text = await tesseract.recognize(tempFile, config);

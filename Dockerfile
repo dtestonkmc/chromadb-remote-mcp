@@ -6,7 +6,7 @@ WORKDIR /app
 RUN corepack enable
 
 # Install dependencies
-COPY package.json yarn.lock* ./
+COPY package.json yarn.lock* .yarnrc.yml ./
 RUN yarn install
 
 # Copy source code
@@ -32,12 +32,10 @@ WORKDIR /app
 RUN corepack enable
 
 # Copy package files
-COPY package.json yarn.lock* ./
+COPY package.json yarn.lock* .yarnrc.yml ./
 
 # Copy node_modules from builder stage
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.yarn ./.yarn
-COPY --from=builder /app/.pnp.* ./
 
 # Copy built files from builder
 COPY --from=builder /app/build ./build
